@@ -27,6 +27,7 @@ const fetchCoins = async () => {
         console.error(err);
     }
 }
+
 // favourite
 const fetchFavouriteCoins = () => {
     return JSON.parse(localStorage.getItem('favourites')) || [];
@@ -42,19 +43,21 @@ const handleFavClick = (element) => {
     // if coin already present in fav remove it otherwise 
     if(favourites.includes(element.dataset.id)){
         // remove coin id
-        element.classList.remove('favourite');
+        // element.classList.remove('favourite');
         const newFavourites = favourites.filter((favourite)=>(
             favourite !== element.dataset.id
         ))
         saveFavouriteCoins(newFavourites)
     }else{
         // save coin id
-        element.classList.add('favourite');
+        // element.classList.add('favourite');
         favourites.push(element.dataset.id)
         saveFavouriteCoins(favourites)
     }
+    displayCoins(getCoinsToDisplay(coins,currentPage),currentPage)
 }
 
+// shimmer or loader
 const showShimmer = () => {
     shimmerContainer.style.display='flex'
 }
@@ -62,12 +65,12 @@ const hideShimmer = () => {
     shimmerContainer.style.display='none'
 }
 
+// show the data on the page
 const getCoinsToDisplay = (coins,page) => {
     const start = (page - 1) * itemPerPage; //0 16 31
     const end = start + itemPerPage;
     return coins.slice(start,end);
 }
-// show the data on the page
 const displayCoins = (coins,page) => {
     const favourites = fetchFavouriteCoins();
 
@@ -117,7 +120,6 @@ const renderPagination = (coins) => {
         paginationContainer.appendChild(pageBtn)
     }
 };
-
 const updatePaginationButton = () => {
     const pageBtns = document.querySelectorAll('.page-btn');
     pageBtns.forEach((btn,index) => {
