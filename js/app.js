@@ -1,6 +1,6 @@
 // 1:25:39
 const shimmerContainer = document.getElementsByClassName('shimmer-container')[0];
-const paginationConatinr = document.getElementById('pagination');
+const paginationContainer = document.getElementById('pagination');
 
 const options ={
     method: "GET",
@@ -27,8 +27,32 @@ const fetchCoins = async () => {
         console.error(err);
     }
 }
-
-const handleFavClick = (coinId) => {  
+// favourite
+const fetchFavouriteCoins = () => {
+    return JSON.parse(localStorage.getItem('favourites')) || [];
+}
+const saveFavouriteCoins = (favourites) => {
+    localStorage.setItem('favourites',JSON.stringify(favourites))
+}
+const removeFavouriteCoins = (favourites) => {
+    localStorage.setItem('favourites',JSON.stringify(favourites))
+}
+const handleFavClick = (element) => {
+    const favourites = fetchFavouriteCoins();
+    // if coin already present in fav remove it otherwise 
+    if(favourites.includes(element.dataset.id)){
+        // remove coin id
+        element.classList.remove('favourite');
+        const newFavourites = favourites.filter((favourite)=>(
+            favourite !== element.dataset.id
+        ))
+        saveFavouriteCoins(newFavourites)
+    }else{
+        // save coin id
+        element.classList.add('favourite');
+        favourites.push(element.dataset.id)
+        saveFavouriteCoins(favourites)
+    }
 }
 
 const showShimmer = () => {
@@ -44,29 +68,27 @@ const getCoinsToDisplay = (coins,page) => {
     return coins.slice(start,end);
 }
 // show the data on the page
-const displayCoins = (coins) => {
+const displayCoins = (coins,page) => {
+    const favourites = fetchFavouriteCoins();
+
+    const start = (page - 1) * itemPerPage + 1;
     const tableBody = document.getElementById('crypto-table-body')
     tableBody.innerHTML = "";
     coins.forEach((coin,index) => {
+        const isfavourite = favourites.includes(coin.id) ? "favourite" : "";
+
         const row = document.createElement('tr');
         row.innerHTML = `
-                    <td>${index+1}</td>
+                    <td>${start + index}</td>
                     <td><img src="${coin.image}" alt="${coin.name}" width="24" height="24"></td>
                     <td>${coin.name}</td>
                     <td>$${coin.current_price}</td>
                     <td>$${coin.total_volume}</td>
                     <td>$${coin.market_cap}<</td>
                     <td>
-                        <i class="fa-solid fa-star favourite-icon" data-id="${coin.id}"></i>
+                        <i class="fa-solid fa-star favourite-icon ${isfavourite}" data-id="${coin.id}" onclick="handleFavClick(this)"></i>
                     </td>`;
 
-        row
-        .querySelector(".favourite-icon")
-        .addEventListener('click',(event)=>{
-            event.stopPropagation()
-            handleFavClick(coin.id)
-
-        })
         tableBody.appendChild(row)
     })
 }
@@ -74,9 +96,9 @@ const displayCoins = (coins) => {
 // pagination
 const renderPagination = (coins) => {
     const totalPage = Math.ceil(coins.length / itemPerPage)
-    paginationConatinr.innerHTML = "";
+    paginationContainer.innerHTML = "";
 
-    for(let i = 1 ; i < totalPage ; i++){
+    for(let i = 1 ; i <= totalPage ; i++){
         const pageBtn = document.createElement('button');
         pageBtn.textContent = i;
 
@@ -90,9 +112,9 @@ const renderPagination = (coins) => {
         pageBtn.addEventListener('click',() => {
             currentPage = i;
             updatePaginationButton();
+            displayCoins(getCoinsToDisplay(coins,currentPage),currentPage)
         })
-        console.log(pageBtn)
-        paginationConatinr.appendChild(pageBtn)
+        paginationContainer.appendChild(pageBtn)
     }
 };
 
@@ -112,12 +134,11 @@ document.addEventListener("DOMContentLoaded",async()=>{
     try{
         showShimmer();
         coins = await fetchCoins();
-        displayCoins(getCoinsToDisplay(coins,currentPage))
+        displayCoins(getCoinsToDisplay(coins,currentPage),currentPage)
         renderPagination(coins)
     }catch(error){
         console.log("Error in fetch data",error)
     }    
     hideShimmer();
-    console.log('coins',coins)
     
 })

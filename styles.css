@@ -127,3 +127,11 @@ tr:hover {
     background-color: #4caf50;
     color: white;
  }
+
+ .favourite-icon{
+    cursor: pointer;
+ }
+ .favourite-icon:hover,
+ .favourite-icon.favourite{
+    color: gold;
+ }
