@@ -1,4 +1,3 @@
-// 1:25:39
 const shimmerContainer = document.getElementsByClassName('shimmer-container')[0];
 const paginationContainer = document.getElementById('pagination');
 const sortPriceAsc = document.getElementById('sort-price-asc');

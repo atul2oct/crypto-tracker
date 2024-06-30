@@ -1,1 +1,4 @@
 api: https://docs.coingecko.com/reference/introduction
+
+
+line chart - https://www.chartjs.org/docs/latest/charts/line.html

@@ -14,10 +14,6 @@ const options ={
     }
 }
 
-let coins = [];
-const itemPerPage = 15;
-let currentPage = 1;
-
 // fetching the data from api
 const fetchFavouriteCoins = async (coinIds) => {
     try{
@@ -45,19 +41,6 @@ const hideShimmer = () => {
     shimmerContainer.style.display='none'
 };
 
-// removeFavouriteCoins
-const removeFavouriteCoins = (favourites) => {
-    localStorage.setItem('favourites',JSON.stringify(favourites))
-};
-const handleFavClick = (coinId) => {
-    const favourites = getFavouriteCoins();
-    // here coin is already present in fav remove it
-    const newFavourites = favourites.filter((favourite)=>(
-        favourite !== coinId
-    ))
-    removeFavouriteCoins(newFavourites)
-    displayCoins(getCoinsToDisplay(coins,currentPage),currentPage)
-};
 // render coins
 const displayFavouriteCoins = (favCoins) => {
     const tableBody = document.getElementById('favourites-table-body');
@@ -71,19 +54,11 @@ const displayFavouriteCoins = (favCoins) => {
                     <td>${coin.name}</td>
                     <td>$${coin.current_price.toLocaleString()}</td>
                     <td>$${coin.total_volume.toLocaleString()}</td>
-                    <td>$${coin.market_cap.toLocaleString()}</td>
-                    <td>
-                        <i class="fa-solid fa-star favourite-icon favourite" data-id="${coin.id}"></i>
-                    </td>`;
+                    <td>$${coin.market_cap.toLocaleString()}</td>`;
         row.addEventListener('click',() => {
             window.open(`../coin/coin.html?id=${coin.id}`,"_blank");
-        })
-        row
-        .querySelector('.favourite-icon')
-        .addEventListener('click',(event) => {
-            event.stopPropagation();
-            handleFavClick(coin.id);
         });
+        
         tableBody.appendChild(row)
     })
 };
@@ -95,7 +70,6 @@ document.addEventListener("DOMContentLoaded",async()=>{
         showShimmer();
         const favourite = getFavouriteCoins();
         if(favourite.length > 0){
-            console.log("hereee")
             const favouriteCoins = await fetchFavouriteCoins(favourite);
             displayFavouriteCoins(favouriteCoins);
         }else{
